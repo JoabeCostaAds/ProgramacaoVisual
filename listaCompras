@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compras</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .task-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .task {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .task.completed {
+            background-color: #27ae60; /* Verde */
+            color: #fff;
+        }
+
+        .task.todo {
+            background-color: #f39c12; /* Amarelo */
+            color: #fff;
+        }
+
+        .task-text {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .status,
+        .quantity,
+        .value,
+        .total {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .remove-button {
+            background-color: #e74c3c; /* Vermelho */
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .add-task-input,
+        .add-task-input-small {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .add-task-button {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-task-button:hover {
+            background-color: #2980b9;
+        }
+
+        #total {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="task-container">
+        <h2>Lista de Compras</h2>
+        <ul class="task-list" id="task-list">
+            <!-- Lista de tarefas aparecerá aqui -->
+        </ul>
+        <input class="add-task-input" type="text" id="new-task" placeholder="Novo Item">
+        <input class="add-task-input-small" type="number" id="quantity" placeholder="Quantidade">
+        <input class="add-task-input-small" type="number" id="value" placeholder="Valor Unitário">
+        <button class="add-task-button" onclick="addTask()">Adicionar Item</button>
+        <div id="total">Total: R$ <span id="total-value">0.00</span></div>
+    </div>
+
+    <script>
+        function addTask() {
+            const taskText = document.getElementById('new-task').value;
+            const quantity = document.getElementById('quantity').value;
+            const value = document.getElementById('value').value;
+
+            if (taskText.trim() !== '' && quantity && value) {
+                const taskList = document.getElementById('task-list');
+
+                const taskItem = document.createElement('li');
+                taskItem.className = 'task todo'; // Inicia como "a fazer"
+
+                const taskTextElement = document.createElement('span');
+                taskTextElement.className = 'task-text';
+                taskTextElement.textContent = taskText;
+
+                const statusElement = document.createElement('span');
+                statusElement.className = 'status';
+                statusElement.textContent = 'A fazer';
+
+                const quantityElement = document.createElement('span');
+                quantityElement.className = 'quantity';
+                quantityElement.textContent = `Quantidade: ${quantity}`;
+
+                const valueElement = document.createElement('span');
+                valueElement.className = 'value';
+                valueElement.textContent = `Valor Unitário: R$ ${value}`;
+
+                const totalElement = document.createElement('span');
+                totalElement.className = 'total';
+                const totalValue = (quantity * value).toFixed(2);
+                totalElement.textContent = `Total: R$ ${totalValue}`;
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-button';
+                removeButton.textContent = 'Remover';
+                removeButton.onclick = function() {
+                    taskItem.remove();
+                    updateTotal();
+                };
+
+                taskItem.appendChild(taskTextElement);
+                taskItem.appendChild(statusElement);
+                taskItem.appendChild(quantityElement);
+                taskItem.appendChild(valueElement);
+                taskItem.appendChild(totalElement);
+                taskItem.appendChild(removeButton);
+
+                taskList.appendChild(taskItem);
+
+                // Limpar os campos de entrada
+                document.getElementById('new-task').value = '';
+                document.getElementById('quantity').value = '';
+                document.getElementById('value').value = '';
+
+                // Adiciona o evento de click para alternar entre "concluído" e "a fazer"
+                taskItem.onclick = function() {
+                    if (taskItem.classList.contains('completed')) {
+                        taskItem.classList.remove('completed');
+                        taskItem.classList.add('todo');
+                        taskItem.style.backgroundColor = '#f39c12'; /* Amarelo */
+                        statusElement.textContent = 'A fazer';
+                    } else {
+                        taskItem.classList.remove('todo');
+                        taskItem.classList.add('completed');
+                        taskItem.style.backgroundColor = '#27ae60'; /* Verde */
+                        statusElement.textContent = 'Concluído';
+                    }
+
+                    updateTotal();
+                };
+
+                updateTotal();
+            }
+        }
+
+        function updateTotal() {
+            const totalElement = document.getElementById('total-value');
+            const tasks = document.querySelectorAll('.task');
+
+            let total = 0;
+
+            tasks.forEach(task => {
+                const isCompleted = task.classList.contains('completed');
+                const quantity = parseFloat(task.querySelector('.quantity').textContent.split(': ')[1]);
+                const value = parseFloat(task.querySelector('.value').textContent.split('R$ ')[1]);
+
+                if (isCompleted) {
+                    total += quantity * value;
+                }
+            });
+
+            totalElement.textContent = total.toFixed(2);
+        }
+    </script>
+</body>
+</html>
