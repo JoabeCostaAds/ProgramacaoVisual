@@ -1,94 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check List - ProAG</title>
+    <title>Lista de Compras</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-        }
-
-        .green-list {
-            background-color: #0a5e2d;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            height: 10px; /* Ajustado para ocupar a altura total */
-        }
-
-        .yellow-list {
-            background-color: #fdc727;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            height: 1px; /* Ajustado para ocupar 20% da altura total */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
         .task-container {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%; /* Alteração para responsividade */
-            max-width: 400px; /* Adicionado limite de largura */
+            width: 90%;
+            max-width: 400px;
             padding: 20px;
-            position: fixed; /* Fixa o elemento na tela */
-            left: 20px; /* Define a distância da borda esquerda */
-            top: 150px; /* Define a distância da borda superior */
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
         }
 
         .task-list {
             list-style-type: none;
             padding: 0;
-            margin-left: 10px; /* Adiciona espaço à esquerda */
-        }
-
-        .add-task-input {
-            width: calc(100% - 20px); /* Adiciona espaço à esquerda e direita */
-            padding: 8px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            margin-left: 10px; /* Adiciona espaço à esquerda */
-        }
-
-        .add-task-button {
-            width: calc(100% - 20px); /* Adiciona espaço à esquerda e direita */
-            padding: 8px;
-            box-sizing: border-box;
-            background-color: #0a5e2d;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-left: 10px; /* Adiciona espaço à esquerda */
-        }
-
-        .add-task-button:hover {
-            background-color: #2980b9;
-        }
-
-        .add-task-button-container {
-            position: sticky;
-            top: 20px;
-            z-index: 1;
-            background-color: #fff;
-            padding: 10px;
         }
 
         .task {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             border-bottom: 1px solid #ddd;
             padding: 10px 0;
             cursor: pointer;
@@ -107,13 +51,16 @@
 
         .task-text {
             font-weight: bold;
-            text-align: center; /* Centraliza o texto */
-            margin-left: 10px; /* Adiciona espaço ao lado esquerdo */
+            text-align: center;
+            margin-bottom: 5px;
         }
 
-        .status {
+        .status,
+        .quantity,
+        .value,
+        .total {
             font-size: 12px;
-            margin-left: 10px; /* Adiciona espaço entre o nome e o status */
+            margin-bottom: 5px;
         }
 
         .remove-button {
@@ -123,42 +70,59 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 4px;
-            margin-left: auto; /* Move para a esquerda */
-            margin-right: 10px; /* Ajusta a distância entre o status e o botão */
             margin-top: 5px;
+        }
+
+        .add-task-input,
+        .add-task-input-small {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .add-task-button {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-task-button:hover {
+            background-color: #2980b9;
+        }
+
+        #total {
+            margin-top: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
-
 <body>
-    <div class="green-list">
-        <h3></h3>
-        <ul>
-        </ul>
-    </div>
-    <div class="yellow-list">
-        <h3></h3>
-        <ul>
-        </ul>
-    </div>
-
     <div class="task-container">
-        <div class="header">
-            <h2>Check List - ProAG</h2>
-        </div>
-        <div class="add-task-button-container">
-            <input class="add-task-input" type="text" id="new-task" placeholder="Nova Tarefa">
-            <button class="add-task-button" onclick="addTask()">Adicionar Tarefa</button>
-        </div>
+        <h2>Lista de Compras</h2>
         <ul class="task-list" id="task-list">
             <!-- Lista de tarefas aparecerá aqui -->
         </ul>
+        <input class="add-task-input" type="text" id="new-task" placeholder="Novo Item">
+        <input class="add-task-input-small" type="number" id="quantity" placeholder="Quantidade">
+        <input class="add-task-input-small" type="number" id="value" placeholder="Valor Unitário">
+        <button class="add-task-button" onclick="addTask()">Adicionar Item</button>
+        <div id="total">Total: R$ <span id="total-value">0.00</span></div>
     </div>
 
     <script>
         function addTask() {
             const taskText = document.getElementById('new-task').value;
-            if (taskText.trim() !== '') {
+            const quantity = document.getElementById('quantity').value;
+            const value = document.getElementById('value').value;
+
+            if (taskText.trim() !== '' && quantity && value) {
                 const taskList = document.getElementById('task-list');
 
                 const taskItem = document.createElement('li');
@@ -172,24 +136,43 @@
                 statusElement.className = 'status';
                 statusElement.textContent = 'A fazer';
 
+                const quantityElement = document.createElement('span');
+                quantityElement.className = 'quantity';
+                quantityElement.textContent = `Quantidade: ${quantity}`;
+
+                const valueElement = document.createElement('span');
+                valueElement.className = 'value';
+                valueElement.textContent = `Valor Unitário: R$ ${value}`;
+
+                const totalElement = document.createElement('span');
+                totalElement.className = 'total';
+                const totalValue = (quantity * value).toFixed(2);
+                totalElement.textContent = `Total: R$ ${totalValue}`;
+
                 const removeButton = document.createElement('button');
                 removeButton.className = 'remove-button';
                 removeButton.textContent = 'Remover';
-                removeButton.onclick = function () {
+                removeButton.onclick = function() {
                     taskItem.remove();
+                    updateTotal();
                 };
 
                 taskItem.appendChild(taskTextElement);
                 taskItem.appendChild(statusElement);
+                taskItem.appendChild(quantityElement);
+                taskItem.appendChild(valueElement);
+                taskItem.appendChild(totalElement);
                 taskItem.appendChild(removeButton);
 
                 taskList.appendChild(taskItem);
 
-                // Limpar o campo de entrada
+                // Limpar os campos de entrada
                 document.getElementById('new-task').value = '';
+                document.getElementById('quantity').value = '';
+                document.getElementById('value').value = '';
 
                 // Adiciona o evento de click para alternar entre "concluído" e "a fazer"
-                taskItem.onclick = function () {
+                taskItem.onclick = function() {
                     if (taskItem.classList.contains('completed')) {
                         taskItem.classList.remove('completed');
                         taskItem.classList.add('todo');
@@ -201,10 +184,32 @@
                         taskItem.style.backgroundColor = '#27ae60'; /* Verde */
                         statusElement.textContent = 'Concluído';
                     }
+
+                    updateTotal();
                 };
+
+                updateTotal();
             }
+        }
+
+        function updateTotal() {
+            const totalElement = document.getElementById('total-value');
+            const tasks = document.querySelectorAll('.task');
+
+            let total = 0;
+
+            tasks.forEach(task => {
+                const isCompleted = task.classList.contains('completed');
+                const quantity = parseFloat(task.querySelector('.quantity').textContent.split(': ')[1]);
+                const value = parseFloat(task.querySelector('.value').textContent.split('R$ ')[1]);
+
+                if (isCompleted) {
+                    total += quantity * value;
+                }
+            });
+
+            totalElement.textContent = total.toFixed(2);
         }
     </script>
 </body>
-
 </html>
