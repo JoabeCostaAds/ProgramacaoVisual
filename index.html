@@ -25,14 +25,12 @@
             padding: 20px;
             overflow-y: auto;
             max-height: 400px;
-            display: flex;
-            flex-direction: column-reverse; /* Inverte a direção da coluna para rolar para o primeiro item */
         }
 
         .task-list {
             list-style-type: none;
             padding: 0;
-            margin: 0; /* Adicionado para remover a margem padrão da lista */
+            margin: 0;
         }
 
         .task {
@@ -169,7 +167,8 @@
                 taskItem.appendChild(totalElement);
                 taskItem.appendChild(removeButton);
 
-                taskList.appendChild(taskItem);
+                // Adiciona no início para exibir no topo da lista
+                taskList.insertBefore(taskItem, taskList.firstChild);
 
                 // Limpar os campos de entrada
                 document.getElementById('new-task').value = '';
