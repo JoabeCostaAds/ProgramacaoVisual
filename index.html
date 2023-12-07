@@ -104,11 +104,21 @@
             margin-top: 10px;
             font-weight: bold;
         }
+
+        .nav-buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
     <div class="task-container">
         <h2>Lista de Compras</h2>
+        <div class="nav-buttons">
+            <button onclick="navigate(-1)">Anterior</button>
+            <button onclick="navigate(1)">Próximo</button>
+        </div>
         <ul class="task-list" id="task-list">
             <!-- Lista de tarefas aparecerá aqui -->
         </ul>
@@ -120,6 +130,8 @@
     </div>
 
     <script>
+        let currentItemIndex = 0;
+
         function addTask() {
             const taskText = document.getElementById('new-task').value;
             const quantity = document.getElementById('quantity').value;
@@ -213,6 +225,23 @@
             });
 
             totalElement.textContent = total.toFixed(2);
+        }
+
+        function navigate(direction) {
+            const tasks = document.querySelectorAll('.task');
+            currentItemIndex += direction;
+
+            if (currentItemIndex < 0) {
+                currentItemIndex = 0;
+            } else if (currentItemIndex >= tasks.length) {
+                currentItemIndex = tasks.length - 1;
+            }
+
+            tasks.forEach((task, index) => {
+                if (index === currentItemIndex) {
+                    task.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
         }
     </script>
 </body>
